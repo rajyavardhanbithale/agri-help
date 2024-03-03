@@ -1,27 +1,38 @@
 'use client'
+import { IonIcon } from "@ionic/react"
+import { searchOutline } from "ionicons/icons"
+
 
 export default function WeatherTop(props) {
     const data = props?.data
+
+
+
     return (
         <>
             {data?.location?.name ? (
-                <div className="w-full ml-3">
-                    <h1 className="text-4xl font-semibold">{data?.location?.name}, {data?.location?.country_code}</h1>
-                    <div className="text-xl">{data?.current?.last_update_formatted}</div>
-
+                <div className="w-full ml-3 flex gap-4 justify-between">
+                    <div>
+                        <h1 className="text-4xl font-semibold">{data?.location?.name}, {data?.location?.country_code}</h1>
+                        <div className="text-xl">{data?.current?.last_update_formatted}</div>
+                    </div>
+       
                 </div>
             ) : (<div className="w-1/2 ml-3 space-y-3">
                 <h1 className="animate-pulse text-4xl rounded-2xl bg-gray-200 text-transparent font-semibold">1212312313213</h1>
                 <div className="animate-pulse w-3/4 rounded-2xl bg-gray-200 text-transparent">123</div>
-
+                                    
+                                    
             </div>)}
 
-
+            
 
 
             <div className="ml-auto mr-auto lg:mr-0 flex mt-1 justify-between items-center w-[90%] md:flex md:mt-1 md:w-1/2 lg:w-[30%] ">
                 {data?.location?.name ? (
                     <>
+                        
+
                         <div className="flex my-4 text-center md:w-44 sm:w-1/2 px-3">
                             <img src={`https://openweathermap.org/img/wn/${data?.current?.condition?.icon_code}@4x.png`} alt="weather icon " className="lg:h-40 h-32" />
                         </div>
@@ -32,6 +43,7 @@ export default function WeatherTop(props) {
                             </div>
                             <div className="text-center text-base sm:text-left">{data?.current?.condition?.type1} | {data?.current?.condition?.type2?.main}</div>
                         </div>
+                        
                     </>
                 ) : (
                     <div className="w-full ml-3">
