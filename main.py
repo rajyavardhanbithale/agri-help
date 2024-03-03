@@ -1,11 +1,9 @@
-from multiprocessing import process
-from turtle import update
-from fastapi import FastAPI, APIRouter, Request, HTTPException, UploadFile, File
 
+from fastapi import FastAPI, APIRouter, Request, HTTPException, UploadFile, File
 import os
 
 from fastapi.middleware.cors import CORSMiddleware
-from numpy import insert
+from httpx import request
 import pymongo
 import json
 import time
@@ -13,7 +11,6 @@ import time
 import random
 import time
 
-from pyparsing import col
 
 # custom import
 import base_models
@@ -24,17 +21,17 @@ from user import check_unique
 from user import forgot_password
 from user import delete_user
 from verification import sendMail
-
+from weather import analyse
 from ml import fertilizer_reco
 from ml import disease_pred
 from ml import crop_reco
 
 from shop import order_tracking
-from shop import scheme
 from weather import weather
-from pymongo import MongoClient
-from bson import ObjectId  # Import ObjectId from bson
+
 from dotenv import load_dotenv
+
+from shop import admin
 
 load_dotenv()
 
@@ -44,8 +41,7 @@ if (os.getenv("ENV") == "DEV"):
 
 else:
     print("[**] Production GLOBAL")
-    client = pymongo.MongoClient(
-        f"mongodb+srv://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('MONGO_CLUSTER')}/?retryWrites=true&w=majority")
+    client = pymongo.MongoClient(f"mongodb+srv://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('MONGO_CLUSTER')}/?retryWrites=true&w=majority")
 
 db = client["agrihelp"]
 collection = db["shop"]
@@ -58,6 +54,8 @@ class BackendAPI:
         self.app_version = "v2"
         self.router.add_api_route(
             f"/{self.app_version}/weather/current", self.getWeatherToday, methods=["GET"])
+        self.router.add_api_route(
+            f"/{self.app_version}/weather/analyse", self.getAnalyse, methods=["GET"])
         self.router.add_api_route(
             f"/{self.app_version}/weather/forecast-today", self.getWeatherForecastToday, methods=["GET"])
 
@@ -114,6 +112,20 @@ class BackendAPI:
         
         self.router.add_api_route(
             f"/{self.app_version}/" + "roadmap", self.roadmap, methods=["POST"])
+        
+        
+        self.router.add_api_route(
+            f"/{self.app_version}/" + "rental-item", self.rentalItem, methods=["GET"])
+        self.router.add_api_route(
+            f"/{self.app_version}/" + "rental-category", self.rentalCategory, methods=["GET"])
+
+        self.router.add_api_route(
+            f"/{self.app_version}/" + "rental-product", self.rentalProduct, methods=["GET"])
+        
+        self.router.add_api_route(
+            f"/{self.app_version}/" + "shop-admin", self.shopAdmin, methods=["POST"])
+        self.router.add_api_route(
+            f"/{self.app_version}/" + "shop-create-image", self.shopAdminCreateImage, methods=["POST"])
 
         if (os.getenv("ENV") == "DEV"):
             print("[*] DEV")
@@ -285,6 +297,11 @@ class BackendAPI:
     async def getWeatherToday(self, city: str = None, lat: float = None, lon: float = None):
         runner = weather.Weather()
         return runner.weatherToday(city=city, lat=lat, lon=lon)
+    
+    
+    
+    def getAnalyse(self, city: str = None):
+        return analyse.summ(city=city)
 
     async def getWeatherForecastToday(self, city: str = None, lat: float = None, lon: float = None):
         runner = weather.Weather()
@@ -299,24 +316,27 @@ class BackendAPI:
         # runner = weather.Weather()
         # getData = runner.weatherToday(city=city,lat=None,lon=None)
         # temp, humid = getData["current"]["temp"], getData["current"]["humidity"]
-        return crop_reco.crop_prediction(N=N, P=P, K=K, ph=ph, humidity=50, rainfall=rain, temperature=28)
+        return crop_reco.crop_prediction(N=N, P=P, K=K, ph=ph, humidity=85, rainfall=rain, temperature=28)
 
     async def fertilizerReccom(self, N: float, P: float, K: float, crop: str):
         return fertilizer_reco.fert_recommend(N=N, P=P, K=K, crop=crop)
 
-    async def cropDefect(self, file: UploadFile = File(...)):
+    async def cropDefect(self, file1: UploadFile = File(...)):
         unique = time.time()
+        print(file1)
         try:
-            contents = file.file.read()
-            with open(f"crop_image/{unique}"+file.filename, 'wb') as f:
+
+            contents = file1.file.read()
+            with open(f"crop_image/{unique}"+file1.filename, 'wb') as f:
                 f.write(contents)
         except Exception:
             return {"message": "There was an error uploading the file"}
         finally:
-            file.file.close()
+            file1.file.close()
 
         # return file.filename
-        return disease_pred.predict_image(f"crop_image/{unique}"+file.filename)
+        print("(disease_pred.predict_image(file.filename)")
+        return disease_pred.predict_image(f"crop_image/{unique}"+file1.filename)
 
     async def shopItem(self, item: int, category: str):
         random_records = list(collection.aggregate([
@@ -574,6 +594,85 @@ class BackendAPI:
             
         return None
     
+    
+    async def rentalItem(self, item: int, category: str):
+        collection_rental = db["rentalService"]
+        random_records = list(collection_rental.aggregate([
+            {"$match": {"categories": category}},
+            {"$sample": {"size": item}}  # Adjust the size parameter as needed
+        ]))
+
+        records_list = [
+            {**record, "_id": str(record["_id"])} for record in random_records
+        ]
+
+        return records_list
+
+    async def rentalCategory(self, item: str):
+        collection_rental = db["rentalService"]
+        seed_products = collection_rental.find({"type": "tools"})
+
+        records_list = [
+            {**record, "_id": str(record["_id"])} for record in seed_products
+        ]
+
+        return records_list
+
+
+
+    async def rentalProduct(self, productID: str):
+        collection_rental = db["rentalService"]
+        try:
+            # Find the document by ObjectId
+            result = collection_rental.find_one({"productId": productID})
+
+            if result is None:
+                raise HTTPException(
+                    status_code=404, detail="Product not found")
+
+            # Convert ObjectId to string in the result
+            result["_id"] = str(result["_id"])
+
+            return result
+        except Exception as e:
+            raise HTTPException(
+                status_code=500, detail=f"Internal Server Error: {str(e)}")    
+    
+    
+    async def shopAdmin(self,task:base_models.ShopAdminCreate):
+        if task.method == 'create':
+            create = admin.adminCreateProduct(collection=collection,request=task)
+            
+            return True if create else False
+        
+        
+        if task.method == "update":
+            print(task)
+            update = admin.adminUpdateProduct(collection=collection,request=task)
+        
+            return True if update else False
+        
+        
+        if task.method == "delete":
+            delete = admin.adminDeleteProduct(collection=collection,request=task)
+        
+            return True if delete else False
+        
+        
+    async def shopAdminCreateImage(self, file1: UploadFile = File(...)):
+        unique = time.time()
+        try:
+            contents = file1.file.read()
+            with open(f"shop-image/{unique}"+file1.filename, 'wb') as f:
+                f.write(contents)
+        except Exception:
+            return {"message": "There was an error uploading the file"}
+        finally:
+            file1.file.close()
+        
+        
+        
+    
     async def ping(self):
         
         raise HTTPException(status_code=200, detail="PING - PONG")
@@ -588,7 +687,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://192.168.29.82:3000",
         "https://agrihelp-3.vercel.app",
-        "https://agrihelp.vercel.app"
+        "http://192.168.231.72:3000"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -597,4 +696,3 @@ app.add_middleware(
 
 api = BackendAPI()
 app.include_router(api.router)
-
