@@ -59,7 +59,7 @@
 ### Farmer Paradise
 AGRIHELP
 <br>
-Welcome to [AGRIHELP](https://agrihelp-3.vercel.app/) , your ultimate platform for agricultural solutions. AGRIHELP integrates cutting-edge technology with time-tested agricultural practices to empower farmers and agricultural businesses for success.
+Welcome to [AGRIHELP](https://agrihelp.vercel.app/) , your ultimate platform for agricultural solutions. AGRIHELP integrates cutting-edge technology with time-tested agricultural practices to empower farmers and agricultural businesses for success.
 
 ### Services and Features
 
