@@ -31,7 +31,7 @@ export default function Pest() {
                 setLoading(true);
 
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append('file1', file);
 
                 try {
                    
@@ -55,10 +55,11 @@ export default function Pest() {
                 }
             }
         };
-
+        
         uploadAndPostData();
     }, [file]);
-
+    
+    console.log(apiData);
 
     return (
         <>

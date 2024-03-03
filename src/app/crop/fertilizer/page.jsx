@@ -1,5 +1,7 @@
 'use client'
 
+
+import ProductCard from "@/app/components/shop/ProductCard";
 import { IonIcon } from "@ionic/react";
 import axios from "axios";
 import { reloadOutline } from "ionicons/icons";
@@ -14,6 +16,8 @@ export default function Fertilizer() {
     const [selectedCrop, setSelectedCrop] = useState('');
     const [error, setError] = useState(null);
     const cropList = ['rice', 'maize', 'chickpea', 'kidneybeans', 'pigeonpeas', 'mothbeans', 'mungbean', 'blackgram', 'lentil', 'pomegranate', 'banana', 'mango', 'grapes', 'watermelon', 'muskmelon', 'apple', 'orange', 'papaya', 'coconut', 'cotton', 'jute', 'coffee']
+
+    
 
     const [formData, setFormData] = useState({
         Nitrogen: '',
@@ -63,9 +67,9 @@ export default function Fertilizer() {
     };
 
     return (
-        <>
+        <>  
             <div className="-mt-20">
-                <div className="md:flex md:h-screen">
+                <div className="flex  md:h-screen">
                 <img
                         className="hidden lg:block w-1/2 object-cover"
                         src="/assets/crop/fertilizer.webp"
@@ -154,19 +158,24 @@ export default function Fertilizer() {
 
                 <div className="mt-20 lg:w-3/4 mx-auto">
                     {crop ? (
-                        <div className="flex justify-center items-center mb-16 ">
+                        <div className="flex flex-col justify-center items-center mb-16 ">
                             <span className="w-1/2 bg-teal-950 py-6 px-5 text-white text-center text-3xl rounded-2xl font-bold ">RESULT</span>
                         </div>
                     ) : null}
 
                     {crop ? (
+                        <>
                         <div className="w-full p-5 text-2xl text-center md:flex md:justify-between items-center ">
                             <div dangerouslySetInnerHTML={{ __html: crop }} className="leading-loose" />
+                            
                         </div>
+                        <ProductCard width={80} path={"shop/product/"} title={"Fertilizer"} totalItem={6} category={"fertilizer"} />
+                        </>
                     ) : null}
                 </div>
 
-                <div id="recommendation" className="p-20"></div>
+                <div id="recommendation" className=""></div>
+              
             </div>
         </>
     )

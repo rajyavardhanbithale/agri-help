@@ -7,10 +7,12 @@ import axios from 'axios';
 
 import { cityArr1, stateArr1 } from './region'
 import Image from 'next/image';
+import ProductCard from '../components/shop/ProductCard';
 
 
 export default function Crop() {
 
+  
   const [crop, setCrop] = useState(null)
   const [loading, setLoading] = useState(false)
   const [selectedState, setSelectedState] = useState('');
@@ -93,9 +95,9 @@ export default function Crop() {
   return (
     <>
       <div className="-mt-20">
-        <div className="flex mix-h-screen md:h-screen overflow-hidden">
+         <div className="flex  md:h-screen">
           <img
-            className="hidden lg:block w-full md:w-1/2"
+            className="hidden lg:block w-full lg:h-full md:w-1/2 object-cover"
             src="/assets/crop/crop.webp"
             alt=""
           />
@@ -117,7 +119,7 @@ export default function Crop() {
                     name="Nitrogen"
                     value={formData.Nitrogen}
                     onChange={handleInputChange}
-                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
+                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150  hover:scale-[1.05] duration-300"
                     placeholder="Nitrogen"
                   />
                 </div>
@@ -127,7 +129,7 @@ export default function Crop() {
                     name="Phosphorus"
                     value={formData.Phosphorus}
                     onChange={handleInputChange}
-                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
+                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:scale-[1.05] duration-300"
                     placeholder="Phosphorus"
                   />
                 </div>
@@ -137,7 +139,7 @@ export default function Crop() {
                     name="Potassium"
                     value={formData.Potassium}
                     onChange={handleInputChange}
-                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
+                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:scale-[1.05] duration-300"
                     placeholder="Potassium"
                   />
                 </div>
@@ -147,7 +149,7 @@ export default function Crop() {
                     name="PHlevel"
                     value={formData.PHlevel}
                     onChange={handleInputChange}
-                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
+                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:scale-[1.05] duration-300"
                     placeholder="PH level"
                   />
                 </div>
@@ -157,7 +159,7 @@ export default function Crop() {
                     name="Rainfall"
                     value={formData.Rainfall}
                     onChange={handleInputChange}
-                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
+                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:scale-[1.05] duration-300"
                     placeholder="Rain-fall(in mm)"
                   />
                 </div>
@@ -167,7 +169,7 @@ export default function Crop() {
                     name="City"
                     value="INDIA"
                     onChange={handleInputChange}
-                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 duration-300"
+                    className="ring-1 rounded-full w-full px-4 py-3 ring-gray-900/10 text-black transition ease-in-out delay-150 hover:scale-[1.05] duration-300"
                     placeholder="INDIA"
                   />
                 </div>
@@ -228,6 +230,7 @@ export default function Crop() {
             </form>
             <span className="text-red-500 animate-fade text-xl">{error}</span>
           </div>
+
         </div>
 
       {crop?.typeOfCrop && <Result crop={crop} />}
@@ -325,12 +328,15 @@ function Result(crop) {
             </div>
           </div>
         </div>
-
+          
+        <ProductCard width={80} path={"shop/product/"} title={"Seeds"} totalItem={6} category={"seeds"} />
         <div className='md:mb-48 mb-10 mt-5 w-full'>
           <span className="md:w-1/2 w-3/4 bg-teal-950 py-4 px-5 mt-10 mx-auto 
              text-white text-center md:text-2xl text-xl rounded-2xl font-bold  capitalize block">
             frequently asked questions
           </span>
+
+          
 
           <div className="mt-5 md:p-0 p-4">
 
