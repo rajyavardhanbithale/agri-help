@@ -5,7 +5,6 @@ from weather import response_scheme
 
 load_dotenv()
 
-from bardapi import Bard
 
 
 urlForecast = "http://api.weatherapi.com/v1/forecast.json"
