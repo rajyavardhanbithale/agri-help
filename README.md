@@ -1,3 +1,5 @@
+# This repository has been migrated to [NEW REPO](https://github.com/rajyavardhanbithale/agrihelp)
+
 # Agrihelp
 
 <div align="center">
